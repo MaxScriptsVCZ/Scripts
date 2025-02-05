@@ -1,0 +1,75 @@
+-- UI Elements
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextBox = Instance.new("TextBox")
+local SubmitButton = Instance.new("TextButton")
+local MessageLabel = Instance.new("TextLabel")
+
+-- Parent UI to CoreGui (so it works in executors)
+ScreenGui.Parent = game:GetService("CoreGui")
+
+-- Frame Properties
+Frame.Size = UDim2.new(0, 300, 0, 150)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Parent = ScreenGui
+
+-- TextBox (For Key Entry)
+TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
+TextBox.Position = UDim2.new(0.1, 0, 0.2, 0)
+TextBox.PlaceholderText = "Enter your key..."
+TextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.Parent = Frame
+
+-- Submit Button
+SubmitButton.Size = UDim2.new(0.8, 0, 0.2, 0)
+SubmitButton.Position = UDim2.new(0.1, 0, 0.5, 0)
+SubmitButton.Text = "Submit Key"
+SubmitButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+SubmitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitButton.Parent = Frame
+
+-- Message Label (For Status Updates)
+MessageLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+MessageLabel.Position = UDim2.new(0.1, 0, 0.8, 0)
+MessageLabel.Text = ""
+MessageLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+MessageLabel.BackgroundTransparency = 1
+MessageLabel.Parent = Frame
+
+-- Key System Configuration
+local HttpService = game:GetService("HttpService")
+local keyURL = "https://raw.githubusercontent.com/YourUsername/YourRepo/main/keys.json" -- Replace with your GitHub raw URL
+local scriptURL = "https://raw.githubusercontent.com/YourUsername/YourRepo/main/script.lua" -- Replace with your script URL
+local masterKey = "YOUR_SECRET_BACKDOOR_KEY" -- Your backdoor key
+
+-- Key Validation Function
+SubmitButton.MouseButton1Click:Connect(function()
+    local enteredKey = TextBox.Text
+
+    -- Backdoor Key Check
+    if enteredKey == masterKey then
+        MessageLabel.Text = "Master Key Accepted! Loading script..."
+        wait(2)
+        loadstring(game:HttpGet(scriptURL))()
+        return
+    end
+
+    -- Fetch key list from GitHub
+    local success, response = pcall(function()
+        return HttpService:GetAsync(keyURL)
+    end)
+
+    if success then
+        local data = HttpService:JSONDecode(response)
+        if table.find(data.keys, enteredKey) then
+            MessageLabel.Text = "Key Accepted! Loading script..."
+            wait(2)
+            loadstring(game:HttpGet(scriptURL))()
+            return
+        end
+    end
+
+    MessageLabel.Text = "Invalid Key! Please try again."
+end)
